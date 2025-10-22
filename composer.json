@@ -1,0 +1,39 @@
+{
+    "name": "moaladdin/hypervel-modules",
+    "type": "library",
+    "description": "Module creation commands for Hypervel framework",
+    "keywords": [
+        "hypervel",
+        "modules",
+        "hypervel-modules",
+        "hmvc"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mohamed Aladdin",
+            "email": "mohamedalaa2104@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "hypervel/framework": "^0.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "MoAladdin\\HypervelModules\\": "src/"
+        }
+    },
+    "extra": {
+        "hypervel": {
+            "providers": [
+                "MoAladdin\\HypervelModules\\ModuleCommandsServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

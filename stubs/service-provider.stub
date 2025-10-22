@@ -1,0 +1,53 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\{{MODULE_NAME}}\Providers;
+
+use Hypervel\Support\ServiceProvider;
+use Hypervel\Support\Facades\Route;
+
+class {{MODULE_NAME}}ServiceProvider extends ServiceProvider
+{
+    protected string $moduleName = '{{MODULE_NAME}}';
+    protected string $modulePath;
+
+    public function __construct()
+    {
+        $this->modulePath = base_path("modules/{$this->moduleName}");
+    }
+
+    public function boot(): void
+    {
+        $this->loadRoutes();
+    }
+
+    public function register(): void
+    {
+        // Register any services here
+    }
+
+    protected function loadRoutes(): void
+    {
+        // Load web routes
+        if (file_exists($this->modulePath . '/Routes/web.php')) {
+            Route::group(
+                '/',
+                $this->modulePath . '/Routes/web.php',
+                ['middleware' => 'web']
+            );
+        }
+
+        // Load API routes
+        if (file_exists($this->modulePath . '/Routes/api.php')) {
+            Route::group(
+                '/api/'.strtolower($this->moduleName),
+                $this->modulePath . '/Routes/api.php',
+                ['middleware' => 'api']
+            );
+        }
+    }
+
+    // Note: Other resource loading methods can be added here when needed
+    // For now, we focus on route loading which is the most important
+}

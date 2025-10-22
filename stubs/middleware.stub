@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\{{MODULE_NAME}}\Http\Middleware;
+
+use Hypervel\Http\Middleware;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+class {{MODULE_NAME}}Middleware extends Middleware
+{
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        // Add your middleware logic here
+        return $handler->handle($request);
+    }
+}

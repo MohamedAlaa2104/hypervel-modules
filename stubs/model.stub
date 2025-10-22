@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\{{MODULE_NAME}}\Models;
+
+use App\Models\Model;
+
+class {{MODEL_NAME}} extends Model
+{
+    protected $table = '{{TABLE_NAME}}';
+
+    protected $fillable = [
+        'name',
+        'description',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+}

@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\{{MODULE_NAME}}\Database\Seeders;
+
+use App\Modules\{{MODULE_NAME}}\Models\{{CLASS_NAME}};
+use Hypervel\Database\Seeder;
+
+class {{CLASS_NAME}}Seeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // Create sample records
+        {{CLASS_NAME}}::factory(10)->create();
+
+        // Or create specific records
+        // {{CLASS_NAME}}::create([
+        //     'name' => 'Sample {{CLASS_NAME}}',
+        //     'description' => 'This is a sample {{CLASS_NAME}}',
+        //     'status' => 'active',
+        // ]);
+    }
+}
