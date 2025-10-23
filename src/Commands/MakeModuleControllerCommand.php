@@ -9,7 +9,7 @@ use Hypervel\Support\Facades\File;
 
 class MakeModuleControllerCommand extends Command
 {
-    protected ?string $signature = 'make:module-controller {module : The module name} {name : The controller name} {--resource : Generate a resource controller} {--api : Generate an API resource controller}';
+    protected ?string $signature = 'make:module-controller {module : The module name} {name : The controller name} {--resource : Generate a resource controller} {--api : Generate an API resource controller} {--namespace=App\\Modules : The namespace for the module}';
     protected string $description = 'Create a controller for a specific module';
 
     protected string $stubPath;
@@ -24,6 +24,7 @@ class MakeModuleControllerCommand extends Command
     {
         $moduleName = $this->argument('module');
         $controllerName = $this->argument('name');
+        $namespace = $this->option('namespace');
         $modulePath = base_path("modules/{$moduleName}");
 
         if (!is_dir($modulePath)) {
@@ -32,7 +33,7 @@ class MakeModuleControllerCommand extends Command
             return 1;
         }
 
-        $controllerPath = $modulePath . '/Http/Controllers';
+        $controllerPath = $modulePath . '/src/Http/Controllers';
         if (!is_dir($controllerPath)) {
             File::makeDirectory($controllerPath, 0755, true);
         }
@@ -44,7 +45,7 @@ class MakeModuleControllerCommand extends Command
         $isResource = $this->option('resource');
         $isApi = $this->option('api');
 
-        $controllerContent = $this->getControllerTemplate($moduleName, $className, $isResource, $isApi);
+        $controllerContent = $this->getControllerTemplate($moduleName, $className, $isResource, $isApi, $namespace);
         File::put($filePath, $controllerContent);
 
         $this->info("Controller created successfully!");
@@ -66,24 +67,25 @@ class MakeModuleControllerCommand extends Command
         return ucfirst($name) . 'Controller';
     }
 
-    protected function getControllerTemplate(string $moduleName, string $className, bool $isResource, bool $isApi): string
+    protected function getControllerTemplate(string $moduleName, string $className, bool $isResource, bool $isApi, string $namespace): string
     {
         if ($isResource || $isApi) {
-            return $this->getResourceControllerTemplate($moduleName, $className, $isApi);
+            return $this->getResourceControllerTemplate($moduleName, $className, $isApi, $namespace);
         }
 
-        return $this->getBasicControllerTemplate($moduleName, $className);
+        return $this->getBasicControllerTemplate($moduleName, $className, $namespace);
     }
 
-    protected function getBasicControllerTemplate(string $moduleName, string $className): string
+    protected function getBasicControllerTemplate(string $moduleName, string $className, string $namespace): string
     {
         return $this->getStubContent('controller-basic.stub', [
             'MODULE_NAME' => $moduleName,
             'CLASS_NAME' => $className,
+            'NAMESPACE' => $namespace,
         ]);
     }
 
-    protected function getResourceControllerTemplate(string $moduleName, string $className, bool $isApi): string
+    protected function getResourceControllerTemplate(string $moduleName, string $className, bool $isApi, string $namespace): string
     {
         $modelName = str_replace('Controller', '', $className);
         $modelName = rtrim($modelName, 's'); // Remove 's' if plural
@@ -93,6 +95,7 @@ class MakeModuleControllerCommand extends Command
             'CLASS_NAME' => $className,
             'MODEL_NAME' => $modelName,
             'IS_API' => $isApi ? 'true' : 'false',
+            'NAMESPACE' => $namespace,
         ]);
     }
 

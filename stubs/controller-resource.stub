@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\{{MODULE_NAME}}\Http\Controllers;
+namespace {{NAMESPACE}}\{{MODULE_NAME}}\Http\Controllers;
 
-use App\Modules\{{MODULE_NAME}}\Models\{{MODEL_NAME}};
+use {{NAMESPACE}}\{{MODULE_NAME}}\Models\{{MODEL_NAME}};
 use Hypervel\Http\Controllers\Controller;
 use Hypervel\Http\Request;
 

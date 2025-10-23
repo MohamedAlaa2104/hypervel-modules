@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\{{MODULE_NAME}}\Providers;
+namespace {{NAMESPACE}}\{{MODULE_NAME}}\Providers;
 
 use Hypervel\Support\ServiceProvider;
 use Hypervel\Support\Facades\Route;
@@ -30,19 +30,19 @@ class {{MODULE_NAME}}ServiceProvider extends ServiceProvider
     protected function loadRoutes(): void
     {
         // Load web routes
-        if (file_exists($this->modulePath . '/Routes/web.php')) {
+        if (file_exists($this->modulePath . '/src/Routes/web.php')) {
             Route::group(
                 '/',
-                $this->modulePath . '/Routes/web.php',
+                $this->modulePath . '/src/Routes/web.php',
                 ['middleware' => 'web']
             );
         }
 
         // Load API routes
-        if (file_exists($this->modulePath . '/Routes/api.php')) {
+        if (file_exists($this->modulePath . '/src/Routes/api.php')) {
             Route::group(
                 '/api/'.strtolower($this->moduleName),
-                $this->modulePath . '/Routes/api.php',
+                $this->modulePath . '/src/Routes/api.php',
                 ['middleware' => 'api']
             );
         }

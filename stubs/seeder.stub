@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\{{MODULE_NAME}}\Database\Seeders;
+namespace {{NAMESPACE}}\{{MODULE_NAME}}\Database\Seeders;
 
-use App\Modules\{{MODULE_NAME}}\Models\{{CLASS_NAME}};
+use {{NAMESPACE}}\{{MODULE_NAME}}\Models\{{CLASS_NAME}};
 use Hypervel\Database\Seeder;
 
 class {{CLASS_NAME}}Seeder extends Seeder

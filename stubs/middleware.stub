@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\{{MODULE_NAME}}\Http\Middleware;
+namespace {{NAMESPACE}}\{{MODULE_NAME}}\Http\Middleware;
 
 use Hypervel\Http\Middleware;
 use Psr\Http\Message\ResponseInterface;

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\{{MODULE_NAME}}\Database\Factories;
+namespace {{NAMESPACE}}\{{MODULE_NAME}}\Database\Factories;
 
-use App\Modules\{{MODULE_NAME}}\Models\{{CLASS_NAME}};
+use {{NAMESPACE}}\{{MODULE_NAME}}\Models\{{CLASS_NAME}};
 use Hypervel\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Hypervel\Database\Eloquent\Factories\Factory<\App\Modules\{{MODULE_NAME}}\Models\{{CLASS_NAME}}>
+ * @extends \Hypervel\Database\Eloquent\Factories\Factory<\{{NAMESPACE}}\{{MODULE_NAME}}\Models\{{CLASS_NAME}}>
  */
 class {{CLASS_NAME}}Factory extends Factory
 {

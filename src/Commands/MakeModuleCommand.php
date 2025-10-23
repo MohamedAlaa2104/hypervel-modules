@@ -9,7 +9,7 @@ use Hypervel\Support\Facades\File;
 
 class MakeModuleCommand extends Command
 {
-    protected ?string $signature = 'make:module {name : The name of the module}';
+    protected ?string $signature = 'make:module {name : The name of the module} {--namespace=App\\Modules : The namespace for the module}';
     protected string $description = 'Create a new module with complete structure';
 
     protected string $stubPath;
@@ -23,6 +23,7 @@ class MakeModuleCommand extends Command
     public function handle(): int
     {
         $moduleName = $this->argument('name');
+        $namespace = $this->option('namespace');
         $modulePath = base_path("modules/{$moduleName}");
 
         if (is_dir($modulePath)) {
@@ -31,15 +32,16 @@ class MakeModuleCommand extends Command
         }
 
         $this->info("Creating module: {$moduleName}");
+        $this->info("Using namespace: {$namespace}\\{$moduleName}");
 
         $this->createModuleStructure($moduleName, $modulePath);
-        $this->createComposerJson($moduleName, $modulePath);
-        $this->createServiceProvider($moduleName, $modulePath);
-        $this->createRoutes($moduleName, $modulePath);
+        $this->createComposerJson($moduleName, $modulePath, $namespace);
+        $this->createServiceProvider($moduleName, $modulePath, $namespace);
+        $this->createRoutes($moduleName, $modulePath, $namespace);
         $this->createConfig($moduleName, $modulePath);
-        $this->createControllers($moduleName, $modulePath);
-        $this->createModels($moduleName, $modulePath);
-        $this->createMiddleware($moduleName, $modulePath);
+        $this->createControllers($moduleName, $modulePath, $namespace);
+        $this->createModels($moduleName, $modulePath, $namespace);
+        $this->createMiddleware($moduleName, $modulePath, $namespace);
 
         $this->info("Module {$moduleName} created successfully!");
         $this->line("Module path: {$modulePath}");
@@ -51,23 +53,16 @@ class MakeModuleCommand extends Command
     protected function createModuleStructure(string $moduleName, string $modulePath): void
     {
         $directories = [
-            'Http/Controllers',
-            'Http/Middleware',
-            'Http/Requests',
-            'Models',
-            'Database/Migrations',
-            'Database/Seeders',
-            'Database/Factories',
-            'Routes',
-            'Providers',
+            'src/Http/Controllers',
+            'src/Http/Middleware',
+            'src/Http/Requests',
+            'src/Models',
+            'src/Database/Migrations',
+            'src/Database/Seeders',
+            'src/Database/Factories',
+            'src/Routes',
+            'src/Providers',
             'config',
-            'Resources/lang',
-            'Events',
-            'Listeners',
-            'Jobs',
-            'Mail',
-            'Notifications',
-            'Services',
         ];
 
         foreach ($directories as $dir) {
@@ -77,28 +72,30 @@ class MakeModuleCommand extends Command
         $this->line("✓ Created module directory structure");
     }
 
-    protected function createComposerJson(string $moduleName, string $modulePath): void
+    protected function createComposerJson(string $moduleName, string $modulePath, string $namespace): void
     {
-        $composerContent = $this->getComposerJsonTemplate($moduleName);
+        $composerContent = $this->getComposerJsonTemplate($moduleName, $namespace);
         File::put($modulePath . '/composer.json', $composerContent);
         $this->line("✓ Created composer.json");
     }
 
-    protected function createServiceProvider(string $moduleName, string $modulePath): void
+    protected function createServiceProvider(string $moduleName, string $modulePath, string $namespace): void
     {
         $providerContent = $this->getStubContent('service-provider.stub', [
             'MODULE_NAME' => $moduleName,
+            'NAMESPACE' => $namespace,
         ]);
-        File::put($modulePath . "/Providers/{$moduleName}ServiceProvider.php", $providerContent);
+        File::put($modulePath . "/src/Providers/{$moduleName}ServiceProvider.php", $providerContent);
         $this->line("✓ Created service provider");
     }
 
-    protected function createRoutes(string $moduleName, string $modulePath): void
+    protected function createRoutes(string $moduleName, string $modulePath, string $namespace): void
     {
         $apiRoutes = $this->getStubContent('api-routes.stub', [
             'MODULE_NAME' => $moduleName,
+            'NAMESPACE' => $namespace,
         ]);
-        File::put($modulePath . '/Routes/api.php', $apiRoutes);
+        File::put($modulePath . '/src/Routes/api.php', $apiRoutes);
         $this->line("✓ Created route files");
     }
 
@@ -111,33 +108,36 @@ class MakeModuleCommand extends Command
         $this->line("✓ Created config file");
     }
 
-    protected function createControllers(string $moduleName, string $modulePath): void
+    protected function createControllers(string $moduleName, string $modulePath, string $namespace): void
     {
         $apiController = $this->getStubContent('api-controller.stub', [
             'MODULE_NAME' => $moduleName,
+            'NAMESPACE' => $namespace,
         ]);
-        File::put($modulePath . "/Http/Controllers/ApiController.php", $apiController);
+        File::put($modulePath . "/src/Http/Controllers/ApiController.php", $apiController);
         $this->line("✓ Created default controllers");
     }
 
-    protected function createModels(string $moduleName, string $modulePath): void
+    protected function createModels(string $moduleName, string $modulePath, string $namespace): void
     {
         $modelName = rtrim($moduleName, 's'); // Remove 's' if plural
         $modelContent = $this->getStubContent('model.stub', [
             'MODULE_NAME' => $moduleName,
             'MODEL_NAME' => $modelName,
             'TABLE_NAME' => strtolower($modelName) . 's',
+            'NAMESPACE' => $namespace,
         ]);
-        File::put($modulePath . "/Models/{$modelName}.php", $modelContent);
+        File::put($modulePath . "/src/Models/{$modelName}.php", $modelContent);
         $this->line("✓ Created default model");
     }
 
-    protected function createMiddleware(string $moduleName, string $modulePath): void
+    protected function createMiddleware(string $moduleName, string $modulePath, string $namespace): void
     {
         $middlewareContent = $this->getStubContent('middleware.stub', [
             'MODULE_NAME' => $moduleName,
+            'NAMESPACE' => $namespace,
         ]);
-        File::put($modulePath . "/Http/Middleware/{$moduleName}Middleware.php", $middlewareContent);
+        File::put($modulePath . "/src/Http/Middleware/{$moduleName}Middleware.php", $middlewareContent);
         $this->line("✓ Created middleware");
     }
 
@@ -158,9 +158,10 @@ class MakeModuleCommand extends Command
         return $content;
     }
 
-    protected function getComposerJsonTemplate(string $moduleName): string
+    protected function getComposerJsonTemplate(string $moduleName, string $namespace): string
     {
         $packageName = strtolower($moduleName);
+        $fullNamespace = "{$namespace}\\{$moduleName}";
         return json_encode([
             'name' => "hypervel/module-{$packageName}",
             'type' => 'library',
@@ -183,13 +184,13 @@ class MakeModuleCommand extends Command
             ],
             'autoload' => [
                 'psr-4' => [
-                    "App\\Modules\\{$moduleName}\\" => ''
+                    "{$fullNamespace}\\" => 'src/'
                 ]
             ],
             'extra' => [
                 'hypervel' => [
                     'providers' => [
-                        "App\\Modules\\{$moduleName}\\Providers\\{$moduleName}ServiceProvider"
+                        "{$fullNamespace}\\Providers\\{$moduleName}ServiceProvider"
                     ]
                 ]
             ],

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\{{MODULE_NAME}}\Models;
+namespace {{NAMESPACE}}\{{MODULE_NAME}}\Models;
 
 use App\Models\Model;
 

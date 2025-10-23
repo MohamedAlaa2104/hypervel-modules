@@ -9,7 +9,7 @@ use Hypervel\Support\Facades\File;
 
 class MakeModuleMigrationCommand extends Command
 {
-    protected ?string $signature = 'make:module-migration {module : The module name} {name : The migration name} {--create= : The table to create} {--table= : The table to modify}';
+    protected ?string $signature = 'make:module-migration {module : The module name} {name : The migration name} {--create= : The table to create} {--table= : The table to modify} {--namespace=App\\Modules : The namespace for the module}';
     protected string $description = 'Create a migration for a specific module';
 
     protected string $stubPath;
@@ -32,7 +32,7 @@ class MakeModuleMigrationCommand extends Command
             return 1;
         }
 
-        $migrationPath = $modulePath . '/Database/Migrations';
+        $migrationPath = $modulePath . '/src/Database/Migrations';
         if (!is_dir($migrationPath)) {
             File::makeDirectory($migrationPath, 0755, true);
         }

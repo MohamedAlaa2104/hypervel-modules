@@ -9,7 +9,7 @@ use Hypervel\Support\Facades\File;
 
 class MakeModuleModelCommand extends Command
 {
-    protected ?string $signature = 'make:module-model {module : The module name} {name : The model name} {--migration : Create a migration for the model} {--factory : Create a factory for the model} {--seeder : Create a seeder for the model}';
+    protected ?string $signature = 'make:module-model {module : The module name} {name : The model name} {--migration : Create a migration for the model} {--factory : Create a factory for the model} {--seeder : Create a seeder for the model} {--namespace=App\\Modules : The namespace for the module}';
     protected string $description = 'Create a model for a specific module';
 
     protected string $stubPath;
@@ -24,6 +24,7 @@ class MakeModuleModelCommand extends Command
     {
         $moduleName = $this->argument('module');
         $modelName = $this->argument('name');
+        $namespace = $this->option('namespace');
         $modulePath = base_path("modules/{$moduleName}");
 
         if (!is_dir($modulePath)) {
@@ -32,7 +33,7 @@ class MakeModuleModelCommand extends Command
             return 1;
         }
 
-        $modelPath = $modulePath . '/Models';
+        $modelPath = $modulePath . '/src/Models';
         if (!is_dir($modelPath)) {
             File::makeDirectory($modelPath, 0755, true);
         }
@@ -41,7 +42,7 @@ class MakeModuleModelCommand extends Command
         $fileName = "{$className}.php";
         $filePath = $modelPath . "/{$fileName}";
 
-        $modelContent = $this->getModelTemplate($moduleName, $className);
+        $modelContent = $this->getModelTemplate($moduleName, $className, $namespace);
         File::put($filePath, $modelContent);
 
         $this->info("Model created successfully!");
@@ -59,12 +60,12 @@ class MakeModuleModelCommand extends Command
 
         // Create factory if requested
         if ($this->option('factory')) {
-            $this->createFactory($moduleName, $className, $modulePath);
+            $this->createFactory($moduleName, $className, $modulePath, $namespace);
         }
 
         // Create seeder if requested
         if ($this->option('seeder')) {
-            $this->createSeeder($moduleName, $className, $modulePath);
+            $this->createSeeder($moduleName, $className, $modulePath, $namespace);
         }
 
         return 0;
@@ -75,56 +76,59 @@ class MakeModuleModelCommand extends Command
         return ucfirst(rtrim($name, 's')); // Remove 's' if plural and capitalize
     }
 
-    protected function getModelTemplate(string $moduleName, string $className): string
+    protected function getModelTemplate(string $moduleName, string $className, string $namespace): string
     {
         return $this->getStubContent('model.stub', [
             'MODULE_NAME' => $moduleName,
             'CLASS_NAME' => $className,
             'TABLE_NAME' => strtolower($className) . 's',
+            'NAMESPACE' => $namespace,
         ]);
     }
 
-    protected function createFactory(string $moduleName, string $className, string $modulePath): void
+    protected function createFactory(string $moduleName, string $className, string $modulePath, string $namespace): void
     {
-        $factoryPath = $modulePath . '/Database/Factories';
+        $factoryPath = $modulePath . '/src/Database/Factories';
         if (!is_dir($factoryPath)) {
             File::makeDirectory($factoryPath, 0755, true);
         }
 
         $factoryName = "{$className}Factory.php";
-        $factoryContent = $this->getFactoryTemplate($moduleName, $className);
+        $factoryContent = $this->getFactoryTemplate($moduleName, $className, $namespace);
         File::put($factoryPath . "/{$factoryName}", $factoryContent);
 
         $this->line("✓ Created factory: {$factoryName}");
     }
 
-    protected function createSeeder(string $moduleName, string $className, string $modulePath): void
+    protected function createSeeder(string $moduleName, string $className, string $modulePath, string $namespace): void
     {
-        $seederPath = $modulePath . '/Database/Seeders';
+        $seederPath = $modulePath . '/src/Database/Seeders';
         if (!is_dir($seederPath)) {
             File::makeDirectory($seederPath, 0755, true);
         }
 
         $seederName = "{$className}Seeder.php";
-        $seederContent = $this->getSeederTemplate($moduleName, $className);
+        $seederContent = $this->getSeederTemplate($moduleName, $className, $namespace);
         File::put($seederPath . "/{$seederName}", $seederContent);
 
         $this->line("✓ Created seeder: {$seederName}");
     }
 
-    protected function getFactoryTemplate(string $moduleName, string $className): string
+    protected function getFactoryTemplate(string $moduleName, string $className, string $namespace): string
     {
         return $this->getStubContent('factory.stub', [
             'MODULE_NAME' => $moduleName,
             'CLASS_NAME' => $className,
+            'NAMESPACE' => $namespace,
         ]);
     }
 
-    protected function getSeederTemplate(string $moduleName, string $className): string
+    protected function getSeederTemplate(string $moduleName, string $className, string $namespace): string
     {
         return $this->getStubContent('seeder.stub', [
             'MODULE_NAME' => $moduleName,
             'CLASS_NAME' => $className,
+            'NAMESPACE' => $namespace,
         ]);
     }
 
