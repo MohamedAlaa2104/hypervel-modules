@@ -51,10 +51,11 @@ class MakeModuleModelCommand extends Command
 
         // Create migration if requested
         if ($this->option('migration')) {
+            $tableName = $this->getTableName($className);
             $this->call('make:module-migration', [
                 'module' => $moduleName,
-                'name' => 'create_' . strtolower($className) . 's_table',
-                '--create' => strtolower($className) . 's'
+                'name' => 'create_' . $tableName . '_table',
+                '--create' => $tableName
             ]);
         }
 
@@ -73,15 +74,33 @@ class MakeModuleModelCommand extends Command
 
     protected function getModelClassName(string $name): string
     {
-        return ucfirst(rtrim($name, 's')); // Remove 's' if plural and capitalize
+        // Convert to singular form if it ends with 's' and is longer than 1 character
+        if (str_ends_with($name, 's') && strlen($name) > 1) {
+            return ucfirst(rtrim($name, 's'));
+        }
+        return ucfirst($name);
+    }
+
+    protected function getTableName(string $className): string
+    {
+        $tableName = strtolower($className);
+        
+        // Basic pluralization rules
+        if (str_ends_with($tableName, 'y')) {
+            return rtrim($tableName, 'y') . 'ies';
+        } elseif (str_ends_with($tableName, 's') || str_ends_with($tableName, 'sh') || str_ends_with($tableName, 'ch') || str_ends_with($tableName, 'x') || str_ends_with($tableName, 'z')) {
+            return $tableName . 'es';
+        } else {
+            return $tableName . 's';
+        }
     }
 
     protected function getModelTemplate(string $moduleName, string $className, string $namespace): string
     {
         return $this->getStubContent('model.stub', [
             'MODULE_NAME' => $moduleName,
-            'CLASS_NAME' => $className,
-            'TABLE_NAME' => strtolower($className) . 's',
+            'MODEL_NAME' => $className,
+            'TABLE_NAME' => $this->getTableName($className),
             'NAMESPACE' => $namespace,
         ]);
     }

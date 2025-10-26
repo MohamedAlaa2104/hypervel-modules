@@ -120,7 +120,13 @@ class MakeModuleCommand extends Command
 
     protected function createModels(string $moduleName, string $modulePath, string $namespace): void
     {
-        $modelName = rtrim($moduleName, 's'); // Remove 's' if plural
+        // For module names ending with 's', remove it to get singular form
+        // For others, use the module name as is
+        $modelName = $moduleName;
+        if (str_ends_with($moduleName, 's') && strlen($moduleName) > 1) {
+            $modelName = rtrim($moduleName, 's');
+        }
+        
         $modelContent = $this->getStubContent('model.stub', [
             'MODULE_NAME' => $moduleName,
             'MODEL_NAME' => $modelName,
